@@ -765,3 +765,11 @@ OFFICIAL_COUNTRIES = {
     'ZM': u'ZAMBIA',
     'ZW': u'ZIMBABWE',
 }
+
+def country_for_code(c):
+    c = c.upper()
+    c = 'GB' if c == 'UK' else c
+    for k,v in COUNTRIES:
+        if k == c:
+            return v
+    raise ValueError("%(code)s is not a valid country code" % { 'code': c})

@@ -86,9 +86,31 @@ class CountryField(CharField):
     def __init__(self, *args, **kwargs):
         # Local import so the countries aren't loaded unless they are needed. 
         from django_countries.countries import COUNTRIES 
+        choices = COUNTRIES
+        ordered = kwargs.pop('ordered',None)
+        sort = kwargs.pop('sort',None)
+        if sort:
+            from operator import itemgetter
+            if sort == 'Name':
+                choices = sorted(choices, key = itemgetter(1))
+            else:
+                pass #right now choices is sorted by code already
+        if ordered:
+            choices_in_ordered = {}
+            ordered_choices = []
+            other_choices = []
+            for k,v in choices:
+                if k in ordered:
+                    choices_in_ordered[k]=v
+                else:
+                    other_choices.append((k,v))
+            for o in ordered:
+                ordered_choices.append((o,choices_in_ordered[o]))
+            choices = tuple(ordered_choices + other_choices)
+                
 
         kwargs.setdefault('max_length', 2) 
-        kwargs.setdefault('choices', COUNTRIES) 
+        kwargs.setdefault('choices', choices) 
 
         super(CharField, self).__init__(*args, **kwargs) 
 
