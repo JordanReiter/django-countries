@@ -1,3 +1,4 @@
+from django import forms
 from django.db.models.fields import CharField
 from django.utils.encoding import force_unicode, StrAndUnicode
 from django_countries import settings
@@ -74,6 +75,32 @@ class CountryDescriptor(object):
             value = force_unicode(value)
         instance.__dict__[self.field.name] = value
 
+
+class CountryFormField(forms.CharField):
+    def __init__(self, *args, **kwargs):
+        # Local import so the countries aren't loaded unless they are needed. 
+        from django_countries.countries import COUNTRIES 
+        choices = COUNTRIES
+        ordered = kwargs.pop('ordered',None)
+        sort = kwargs.pop('sort',None)
+        if sort:
+            from operator import itemgetter
+            if sort == 'Name':
+                choices = sorted(choices, key = itemgetter(1))
+            else:
+                pass #right now choices is sorted by code already
+        if ordered:
+            choices_in_ordered = {}
+            ordered_choices = []
+            other_choices = []
+            for k,v in choices:
+                if k in ordered:
+                    choices_in_ordered[k]=v
+                else:
+                    other_choices.append((k,v))
+            for o in ordered:
+                ordered_choices.append((o,choices_in_ordered[o]))
+            choices = tuple(ordered_choices + other_choices)
 
 class CountryField(CharField):
     """
