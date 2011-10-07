@@ -101,8 +101,7 @@ class CountryFormField(forms.ChoiceField):
             for o in ordered:
                 ordered_choices.append((o,choices_in_ordered[o]))
             choices = tuple(ordered_choices + other_choices)
-        kwargs['choices']=choices
-        super(CountryFormField, self).__init__(*args, **kwargs)
+        super(CountryFormField, self).__init__(choices=choices, *args, **kwargs)
 
 class CountryField(CharField):
     """
