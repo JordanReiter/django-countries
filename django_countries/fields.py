@@ -76,7 +76,7 @@ class CountryDescriptor(object):
         instance.__dict__[self.field.name] = value
 
 
-class CountryFormField(forms.CharField):
+class CountryFormField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
         # Local import so the countries aren't loaded unless they are needed. 
         from django_countries.countries import COUNTRIES 
@@ -101,6 +101,8 @@ class CountryFormField(forms.CharField):
             for o in ordered:
                 ordered_choices.append((o,choices_in_ordered[o]))
             choices = tuple(ordered_choices + other_choices)
+        kwargs['choices']=choices
+        super(CountryFormField, self).__init__(*args, **kwargs)
 
 class CountryField(CharField):
     """
